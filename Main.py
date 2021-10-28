@@ -1,6 +1,6 @@
 import os
 from typing import List, Set
-import numpy as np
+import math
 import pandas as pd
 from pandas.core.series import Series
 
@@ -12,33 +12,26 @@ att = list(set(data[data.columns[0]]))
 target = list(set(data[data.columns[0]]))
 
 
-def loop(list, name: str):
-    result = []
-    for i in list:
-        if i[0] in name:
-            result.append(i)
-    return result
-
-
 def separateH(data: List, att_name: List, target_name: List):
-
     result = []
+    temp = []
     for att in att_name:
+        temp.append(att)
         for dt in data:
-            print(dt[0])
-            result.append(loop(data, att))
+            if dt[0] == att:
+                temp.append(dt[2])
+        result.append(temp)
+        temp = []
     return result
 
 
 def find(data: Series, att: int, target: int) -> List:
     att = data.columns[att]
     target = data.columns[target]
-
     result: list = []
-    attset = list(set(list(data[att])))  # value in att
-    # print(attset)
-    target_set = list(set(list(data[target])))  # value in target
-    # print(target_set)
+
+    attset = list(set(list(data[att])))
+    target_set = list(set(list(data[target])))
     for k, v in enumerate(attset):
         for ke, va in enumerate(target_set):
             result.append(
@@ -48,8 +41,36 @@ def find(data: Series, att: int, target: int) -> List:
                     data[(data[att] == v) & (data[target] == va)][target].count(),
                 ]
             )
-    return result
+
+    result = sorted(result, key=lambda r: r[0])
+    print(result)
+    print(separateH(sorted(result, key=lambda r: r[1]), attset, target_set))
+    return separateH(sorted(result, key=lambda r: r[1]), attset, target_set)
 
 
-print(find(data, 1, 4))
-print(separateH(find(data, 1, 4), att, target))
+def mathLog(a, b):
+    c = -a / (a + b) * math.log2(a / (a + b)) - b / (a + b) * math.log2(b / (a + b))
+    return c
+
+
+def mathH(data: List):
+    result = {}
+    count = 0
+    final = 0
+    for k, v in enumerate(data):
+        if v[1] == 0 or v[2] == 0:
+            result[v[0]] = [0, (v[1] + v[2])]
+            continue
+        result[v[0]] = [round(mathLog(v[1], v[2]), 5), (v[1] + v[2])]
+        count += v[1] + v[2]
+    for j in result.values():
+        final += j[1] / count * j[0]
+    return result, final
+
+
+# print(f"copy duong dan file")
+# path = input()
+# print(f"dong muon chon [Luu]")
+# att= input()
+# print(f"nhap dong quyet dinh")
+print(mathH(find(data, 1, 4)), sep="\n")
