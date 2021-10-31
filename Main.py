@@ -29,7 +29,7 @@ def find(data: Series, att: int, target: int) -> List:
     att = data.columns[att]
     target = data.columns[target]
     result: list = []
-
+    count = 0
     attset = list(set(list(data[att])))
     target_set = list(set(list(data[target])))
     for k, v in enumerate(attset):
@@ -43,9 +43,22 @@ def find(data: Series, att: int, target: int) -> List:
             )
 
     result = sorted(result, key=lambda r: r[0])
-    print(result)
-    print(separateH(sorted(result, key=lambda r: r[1]), attset, target_set))
-    return separateH(sorted(result, key=lambda r: r[1]), attset, target_set)
+    #   Chon thuat toan
+    a = mathHID3(separateH(sorted(result, key=lambda r: r[1]), attset, target_set))
+    print(
+        separateH(sorted(result, key=lambda r: r[1]), attset, target_set)
+    )  ## dem so yes no cua mot att ##
+    p = f"H({att})= "
+    for k in a[0]:
+        print(
+            f"I({att}/{k})= -{a[0][k][1]}/{a[0][k][1]+a[0][k][2]}*LOG({a[0][k][1]}/{a[0][k][1]+a[0][k][2]})-{a[0][k][2]}/{a[0][k][1]+a[0][k][2]}*LOG({a[0][k][2]}/{a[0][k][1]+a[0][k][2]})={a[0][k][0]}",
+            end="\n\n",
+        )
+        count += a[0][k][1] + a[0][k][2]
+    for k in a[0]:
+        p += f" + {a[0][k][1]+a[0][k][2]}/{count}*{a[0][k][0]}"
+    print(p + f" = {a[1]}")
+    return a[1], att
 
 
 def mathLog(a, b):
@@ -53,7 +66,7 @@ def mathLog(a, b):
     return c
 
 
-def mathH(data: List):
+def mathHID3(data: List):
     result = {}
     count = 0
     final = 0
@@ -61,16 +74,28 @@ def mathH(data: List):
         if v[1] == 0 or v[2] == 0:
             result[v[0]] = [0, (v[1] + v[2])]
             continue
-        result[v[0]] = [round(mathLog(v[1], v[2]), 5), (v[1] + v[2])]
+        result[v[0]] = [round(mathLog(v[1], v[2]), 5), v[1], v[2]]
         count += v[1] + v[2]
     for j in result.values():
         final += j[1] / count * j[0]
     return result, final
 
 
+def separateData(data, name):
+    atts = list(set(data[name]))
+    result = []
+    for att in atts:
+        temp = data[data[name] == att]
+
+        result.append(temp)
+    return result
+
+
 # print(f"copy duong dan file")
 # path = input()
-# print(f"dong muon chon [Luu]")
-# att= input()
+# print(f"dong muon chon [Luu y bat dau tu 0]")
+# att = int(input())
 # print(f"nhap dong quyet dinh")
-print(mathH(find(data, 1, 4)), sep="\n")
+# target = int(input())
+find(data, 3, 4)
+# print(separateData(data, "temperature"), sep="\n\n")
