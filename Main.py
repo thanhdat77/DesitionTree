@@ -8,6 +8,8 @@ os = os.path.join("dataPlay.xlsx")
 
 
 data = pd.read_excel(os, index_col=0)
+# data = data.drop(data.columns[[0]], axis=1)
+
 att = list(set(data[data.columns[0]]))
 target = list(set(data[data.columns[0]]))
 
@@ -25,13 +27,12 @@ def separateH(data: List, att_name: List, target_name: List):
     return result
 
 
-def find(data: Series, att: int, target: int) -> List:
-    att = data.columns[att]
-    target = data.columns[target]
+def find(data: Series, att: str) -> List:
+    target = data.columns[-1]
     result: list = []
     count = 0
-    attset = list(set(list(data[att])))
-    target_set = list(set(list(data[target])))
+    attset = list(sorted(set(data.loc[:, att])))
+    target_set = list(sorted(set(data.iloc[:, -1])))
     for k, v in enumerate(attset):
         for ke, va in enumerate(target_set):
             result.append(
@@ -42,7 +43,7 @@ def find(data: Series, att: int, target: int) -> List:
                 ]
             )
 
-    result = sorted(result, key=lambda r: r[0])
+    result
     #   Chon thuat toan
     a = mathHID3(separateH(sorted(result, key=lambda r: r[1]), attset, target_set))
     print(
@@ -86,9 +87,35 @@ def separateData(data, name):
     result = []
     for att in atts:
         temp = data[data[name] == att]
-
+        temp = temp.drop([name], axis=1)
         result.append(temp)
     return result
+
+
+def checkout(data, target):
+    temp = list(set(data[target]))[0]
+    for i in data[target]:
+        if temp != i:
+
+            return False
+    return temp
+
+
+def main(data: List, target: str, floor: int):
+
+    floor = 0
+    result = {}
+    # print(list(data.columns))
+    columns = list(data.columns)
+    if checkout(data, target):
+        print(f"Tang {floor} co {0}")
+
+    else:
+        for column in columns:
+            print(column)
+            h = find(data, column, target)
+            # result.add(h[2], h[1])
+    print(result)
 
 
 # print(f"copy duong dan file")
@@ -97,5 +124,9 @@ def separateData(data, name):
 # att = int(input())
 # print(f"nhap dong quyet dinh")
 # target = int(input())
-find(data, 3, 4)
-# print(separateData(data, "temperature"), sep="\n\n")
+print(find(data, "temperature"))
+# print(separateData(data, "temperature"), sep="\n\n", end="\n\n")
+# main(data, "Play", 0)
+print(target_set := list(sorted(set(data.iloc[:, -1]))))
+for k in target_set:
+    print(type(k))
